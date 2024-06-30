@@ -1,5 +1,7 @@
 import { LayoutDashboard, MessageCircle, ChevronRight, Users, Calendar, PieChart, Folder, Settings } from "lucide-react";
 import { useState } from "react";
+import Logo from "./../assets/Schneider.png";
+
 const Sidebar = () => {
   const [open, setOpen] = useState(true);
   const Menus = [
@@ -22,7 +24,7 @@ const Sidebar = () => {
         />
         <div className="flex items-center p-4">
           <img
-            src={"./assets/Schneider.png"}
+            src={Logo}
             className={open ? `cursor-pointer duration-500 transform` : "cursor-pointer duration-500 transform opacity-0"}
             onClick={() => setOpen(!open)}
             alt="Toggleable"
