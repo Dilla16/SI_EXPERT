@@ -4,7 +4,11 @@ import { Link } from "react-router-dom";
 
 const Profile = () => {
   return (
-    <div className="font-poppins">
+    <div className="font-poppins flex items-center gap-5">
+      <div className="row text-right space-y-1">
+        <div className="text-xs">Fadillah Anggraini</div>
+        <div className=" text-[10px]">Admin</div>
+      </div>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Avatar className="cursor-pointer border-2 w-12 h-12">

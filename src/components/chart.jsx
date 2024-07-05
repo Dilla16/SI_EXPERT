@@ -1,5 +1,3 @@
-// DashboardCard.jsx
-
 import { PieChart } from "lucide-react"; // Importing icons for example
 import { useEffect, useState } from "react";
 
@@ -29,24 +27,27 @@ const DashboardCard = () => {
     return () => clearInterval(interval);
   }, [graphData]);
 
+  // Data for the cards
+  const cardsData = [
+    { label: "RTA", value: rtaMetrics.rta, color: "text-blue-500" },
+    { label: "RTA Progress", value: rtaMetrics.rtaProgress, color: "text-green-500" },
+    { label: "RTA Complete", value: rtaMetrics.rtaComplete, color: "text-purple-500" },
+    { label: "RTA Complete", value: rtaMetrics.rtaComplete, color: "text-purple-500" },
+  ];
+
   return (
     <div className="w-full">
-      <div className="grid grid-cols-3 gap-4 mb-6">
-        <div className="flex items-center justify-center flex-col border bg-white p-4 rounded-md shadow-md">
-          <PieChart className="h-full w-10 text-blue-500 mb-2" />
-          <div className="text-gray-600">RTA</div>
-          <div className="text-2xl font-bold text-gray-800">{rtaMetrics.rta}</div>
-        </div>
-        <div className="flex items-center justify-center flex-col border bg-white p-4 rounded-md shadow-md">
-          <PieChart className="h-full w-10 text-green-500 mb-2" />
-          <div className="text-gray-600">RTA Progress</div>
-          <div className="text-2xl font-bold text-gray-800">{rtaMetrics.rtaProgress}</div>
-        </div>
-        <div className="flex items-center justify-center flex-col border bg-white p-4 rounded-md shadow-md">
-          <PieChart className="h-full w-10 text-purple-500 mb-2" />
-          <div className="text-gray-600">RTA Complete</div>
-          <div className="text-2xl font-bold text-gray-800">{rtaMetrics.rtaComplete}</div>
-        </div>
+      <div className="grid grid-cols-4 gap-4 mb-6">
+        {cardsData.map((card, index) => (
+          <div
+            key={index}
+            className="flex items-center justify-center flex-col border bg-white p-4 rounded-md shadow-sm"
+          >
+            <PieChart className={`h-full w-10 mb-2 ${card.color}`} />
+            <div className="text-gray-600">{card.label}</div>
+            <div className="text-2xl font-bold text-gray-800">{card.value}</div>
+          </div>
+        ))}
       </div>
       <h2 className="text-lg font-semibold mb-4">Goods In Analysis</h2>
       <div className="border border-gray-200 rounded-md p-4">
