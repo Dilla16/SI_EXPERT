@@ -1,6 +1,6 @@
 import { useState } from "react";
 import Layout from "@/components/layout";
-import UserData from "./setTable";
+import UserData from "./TableUsers/setTableUser";
 
 const UserPage = () => {
   const [pageTitle, setPageTitle] = useState("");

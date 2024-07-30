@@ -27,6 +27,10 @@ module.exports = {
           DEFAULT: "#EBF3FC",
           foreground: "hsl(var(--secondary-foreground))",
         },
+        success: {
+          DEFAULT: "#23C451",
+          foreground: "hsl(var(--secondary-foreground))",
+        },
       },
       keyframes: {
         "accordion-down": {

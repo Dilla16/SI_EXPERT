@@ -1,17 +1,31 @@
 import { Bell, Search } from "lucide-react";
 import Profile from "./profile";
+import Logo from "./../assets/MainLogo.png";
+import { Link } from "react-router-dom";
 
 const Navbar = () => {
   return (
     <nav className="bg-white font-poppins font-medium p-4 top-0 right-0 w-full shadow-md">
       <div className="flex justify-between items-center px-8">
         <div className="flex items-center gap-4">
-          <Search className="w-5" />
-          <input
-            type="text"
-            placeholder="Type to search..."
-            className="border-none outline-none bg-transparent placeholder-gray-500 text-sm"
-          />
+          <Link
+            to="/"
+            className="flex items-center w-[25%] pe-6"
+          >
+            <img
+              src={Logo}
+              className="w-fit cursor-pointer"
+              alt="Toggleable"
+            />
+          </Link>
+          <div className="flex items-center gap-4">
+            <Search className="w-5" />
+            <input
+              type="text"
+              placeholder="Type to search..."
+              className="border-none outline-none bg-transparent placeholder-gray-500 text-sm"
+            />
+          </div>
         </div>
 
         <div className="flex justify-between gap-4 items-center">

@@ -1,21 +1,22 @@
-"use client";
-
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { EyeIcon, EyeOffIcon } from "lucide-react";
+import axios from "axios";
+import { useToast } from "@/components/ui/use-toast";
 
 const formSchema = z.object({
   sesa: z.string().min(2, {
     message: "Sesa must be at least 2 characters.",
   }),
   password: z.string().min(6, {
-    message: "Pass must be at least 6 characters.",
+    message: "Password must be at least 6 characters.",
   }),
 });
 
@@ -29,17 +30,45 @@ export function Login() {
     },
   });
 
-  function onSubmit(values) {
-    console.log(values);
-  }
+  const token = localStorage.getItem("token");
+  const navigate = useNavigate();
+  const { toast } = useToast();
+
+  const onSubmit = async (values) => {
+    try {
+      const res = await axios.post("https://api-siexpert.vercel.app/api/login", values);
+      localStorage.setItem("token", res.data.data.token);
+      toast({
+        title: "Success",
+        description: "You've login successfully!",
+        className: "text-left",
+        variant: "success",
+      });
+      navigate("/");
+    } catch (err) {
+      const errorMessage = err.response?.data?.message || "An unexpected error occurred";
+
+      toast({
+        title: "Error",
+        description: errorMessage,
+        status: "error",
+      });
+    }
+  };
 
   const togglePasswordVisibility = () => {
     setShowPassword((prevShowPassword) => !prevShowPassword);
   };
 
+  useEffect(() => {
+    if (token) {
+      navigate("/");
+    }
+  }, [token, navigate]);
+
   return (
-    <div className="flex flex-col items-center justify-center h-screen bg-primary font-poppins relative">
-      <div className="w-full max-w-md p-6 bg-white rounded-lg drop-shadow-xl">
+    <div className="flex flex-col items-center justify-center min-h-screen bg-primary font-poppins p-4">
+      <div className="w-full max-w-md bg-white rounded-lg drop-shadow-xl">
         <Card className="rounded-md">
           <CardContent>
             <h2 className="text-2xl font-bold text-center mt-3 mb-6">Login Expertise</h2>
@@ -54,15 +83,19 @@ export function Login() {
                     name="sesa"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="flex justify-start gap-3 items-center">
+                        <FormLabel className="flex justify-between items-center">
                           SESA
                           <FormMessage className="text-xs" />
                         </FormLabel>
                         <FormControl>
                           <Input
-                            placeholder="sesa"
+                            placeholder="SESA.."
                             {...field}
                             className="rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                            onChange={(e) => {
+                              const uppercaseValue = e.target.value.toUpperCase();
+                              field.onChange(uppercaseValue);
+                            }}
                           />
                         </FormControl>
                       </FormItem>
@@ -73,7 +106,7 @@ export function Login() {
                     name="password"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="flex justify-start gap-3 items-center">
+                        <FormLabel className="flex justify-between items-center">
                           Password
                           <FormMessage className="text-xs" />
                         </FormLabel>

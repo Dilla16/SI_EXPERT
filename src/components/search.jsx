@@ -3,16 +3,16 @@ import { Search } from "lucide-react";
 
 const SearchData = ({ searchTerm, setSearchTerm }) => {
   return (
-    <div className="flex items-center">
+    <div className="flex items-center space-x-2">
       <input
         type="text"
         placeholder="Search data..."
-        className="border-none rounded-md p-2 focus:outline-none"
+        className="border-none outline-none rounded-md p-2 text-sm"
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
       />
-      <button className=" text-black p-2 rounded-r-md">
-        <Search />
+      <button className=" text-black rounded-r-md">
+        <Search className="w-5" />
       </button>
     </div>
   );
