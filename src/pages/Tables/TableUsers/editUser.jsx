@@ -36,16 +36,22 @@ const handleUppercaseInput = (event) => {
   event.target.value = event.target.value.toUpperCase();
 };
 
-const EditUserForm = ({ userId, onRefresh }) => {
+const EditUserForm = ({ sesa }) => {
   const { handleSubmit, register, control, reset, setValue } = useForm();
-  const { updateUser } = useUpdateUser(`https://api-siexpert.vercel.app/api/users/${userId}`);
+  const { updateUser } = useUpdateUser(`https://api-siexpert.vercel.app/api/users/${sesa}`);
   const { sectors, loading, error } = useFetchSectors();
   const [selectedDepartments, setSelectedDepartments] = useState([]);
 
   useEffect(() => {
     const fetchUserData = async () => {
+      const token = localStorage.getItem("token");
+
       try {
-        const response = await axios.get(`https://api-siexpert.vercel.app/api/users/${userId}`);
+        const response = await axios.get(`https://api-siexpert.vercel.app/api/users/${sesa}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
         const userData = response.data;
         setValue("sesa", userData.sesa);
         setValue("name", userData.name);
@@ -58,7 +64,7 @@ const EditUserForm = ({ userId, onRefresh }) => {
     };
 
     fetchUserData();
-  }, [userId, setValue]);
+  }, [sesa, setValue]);
 
   const handleCheckboxChange = (value) => {
     setSelectedDepartments((prevSelected) => (prevSelected.includes(value) ? prevSelected.filter((v) => v !== value) : [...prevSelected, value]));
@@ -76,16 +82,17 @@ const EditUserForm = ({ userId, onRefresh }) => {
       await updateUser(dataToSubmit);
       toast({
         title: "Success",
+        className: "text-left",
         description: "Data has been successfully updated.",
         variant: "success",
       });
       reset();
       setSelectedDepartments([]);
-      onRefresh();
     } catch (error) {
       console.error("Error updating data:", error); // Log the error details
       toast({
         title: "Error",
+        className: "text-left",
         description: `Failed to update data: ${error.message}`,
         variant: "destructive",
       });
@@ -232,7 +239,7 @@ const EditUserForm = ({ userId, onRefresh }) => {
 };
 
 EditUserForm.propTypes = {
-  userId: PropTypes.string.isRequired,
+  sesa: PropTypes.string.isRequired,
   onRefresh: PropTypes.func.isRequired,
 };
 

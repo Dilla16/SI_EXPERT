@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
-import { useLocation } from "react-router-dom";
+import { useLocation, Link } from "react-router-dom";
 import { Table, TableCaption, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
 import { Eye, Trash, Download } from "lucide-react";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
@@ -9,6 +9,7 @@ import * as XLSX from "xlsx"; // Import XLSX for Excel export
 import { Button } from "@/components/ui/button";
 import Timeline from "@/components/timeline";
 import Loading from "@/components/loading";
+import { useUser } from "../TableUsers/userContext";
 
 const TableRetur = () => {
   const location = useLocation();
@@ -16,6 +17,8 @@ const TableRetur = () => {
   const [error, setError] = useState(null);
   const [deleteData, setDeleteData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const token = localStorage.getItem("token");
+  const { role: userRole } = useUser();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -27,7 +30,8 @@ const TableRetur = () => {
             Authorization: `Bearer ${token}`,
           },
         });
-        setData(response.data);
+        const returnData = response.data.map((item) => item.returnData);
+        setData(returnData);
         setError(null);
       } catch (error) {
         setError(error);
@@ -40,14 +44,26 @@ const TableRetur = () => {
     fetchData();
   }, []);
 
-  const handleDelete = (data) => {
-    console.log("Deleting data:", data);
-    // Implement your delete logic here
-    setDeleteData(null); // Clear delete data after handling
+  const handleDelete = async (data) => {
+    if (!data) return;
+    console.log(data.id);
+    try {
+      await axios.delete(`https://api-siexpert.vercel.app/api/returns/${data.retur_id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      handleRefresh();
+    } catch (error) {
+      console.error("Error deleting data:", error);
+      setError(error);
+    } finally {
+      setDeleteData(null);
+    }
   };
 
   const handleCancelDelete = () => {
-    setDeleteData(null); // Clear delete data
+    setDeleteData(null);
   };
 
   const confirmDelete = (data) => {
@@ -62,7 +78,6 @@ const TableRetur = () => {
   };
 
   const handleRefresh = () => {
-    // Refresh logic here, e.g., re-fetch data
     const fetchData = async () => {
       const token = localStorage.getItem("token");
 
@@ -96,10 +111,7 @@ const TableRetur = () => {
       <div className="p-4 w-full max-w-full">
         <div className="flex justify-between items-center mt-4 ms-4">
           <div className="flex gap-3 items-center">
-            <AddDataDialog
-              type="data-user"
-              onRefresh={handleRefresh}
-            />
+            <AddDataDialog onRefresh={handleRefresh} />
             <Button
               className="flex gap-1"
               variant="outline"
@@ -110,19 +122,19 @@ const TableRetur = () => {
             </Button>
           </div>
         </div>
-        <div className="m-4">
+        <div className="m-4 pb-4 overflow-auto">
           <Table className="w-full p-4">
-            <TableCaption>A list of users.</TableCaption>
+            <TableCaption>A list of Return.</TableCaption>
             <TableHeader>
               <TableRow>
                 <TableHead className="text-center">No</TableHead>
                 <TableHead className="text-center">Retur No</TableHead>
-                <TableHead className="text-left">Customer Name</TableHead>
+                <TableHead className="text-center">Customer Name</TableHead>
                 <TableHead className="text-center">Country</TableHead>
                 <TableHead className="text-center">Reference</TableHead>
                 <TableHead className="text-center">Qty</TableHead>
-                <TableHead className="text-left">Serial No.</TableHead>
-                <TableHead className="text-left">Issue</TableHead>
+                <TableHead className="text-center">Serial No.</TableHead>
+                <TableHead className="text-center">Issue</TableHead>
                 <TableHead className="text-center">Action</TableHead>
               </TableRow>
             </TableHeader>
@@ -132,33 +144,37 @@ const TableRetur = () => {
                   <TableRow key={index}>
                     <TableCell className="text-center">{index + 1}</TableCell>
                     <TableCell className="text-center">{row.retur_no}</TableCell>
-                    <TableCell className="text-left">{row.customer_name}</TableCell>
-                    <TableCell className="text-left">{row.country}</TableCell>
-                    <TableCell className="text-left">{row.product_id}</TableCell>
-                    <TableCell className="text-left">{row.qty}</TableCell>
-                    <TableCell className="text-left">{row.serial_no}</TableCell>
-                    <TableCell className="text-left">{row.issue}</TableCell>
+                    <TableCell className="text-center">{row.customer_name}</TableCell>
+                    <TableCell className="text-center">{row.country}</TableCell>
+                    <TableCell className="text-center">{row.products.product_name}</TableCell>
+                    <TableCell className="text-center">{row.qty}</TableCell>
+                    <TableCell className="text-center">{row.serial_no}</TableCell>
+                    <TableCell className="text-center">{row.issue}</TableCell>
                     <TableCell className="flex justify-center gap-2">
-                      <Eye className="text-blue-500 cursor-pointer w-5" />
-                      <AlertDialog>
-                        <AlertDialogTrigger>
-                          <Trash
-                            className="text-red-500 cursor-pointer w-5"
-                            onClick={() => confirmDelete(row)}
-                          />
-                        </AlertDialogTrigger>
-                        <AlertDialogContent>
-                          <AlertDialogHeader>
-                            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-                            <AlertDialogDescription>This action cannot be undone. This will permanently delete your data.</AlertDialogDescription>
-                          </AlertDialogHeader>
-                          <AlertDialogFooter>
-                            <AlertDialogCancel onClick={handleCancelDelete}>Cancel</AlertDialogCancel>
-                            <AlertDialogAction onClick={() => handleDelete(deleteData)}>Continue</AlertDialogAction>
-                          </AlertDialogFooter>
-                        </AlertDialogContent>
-                      </AlertDialog>
-                      {location.pathname === "/data-retur" && <Timeline />}
+                      <Link to={`/data-retur/detail/${row.retur_id}`}>
+                        <Eye className="text-blue-500 cursor-pointer w-5" />
+                      </Link>
+                      {userRole === "Admin" && (
+                        <AlertDialog>
+                          <AlertDialogTrigger>
+                            <Trash
+                              className="text-red-500 cursor-pointer w-5"
+                              onClick={() => confirmDelete(row)}
+                            />
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                              <AlertDialogDescription>This action cannot be undone. This will permanently delete your data.</AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel onClick={handleCancelDelete}>Cancel</AlertDialogCancel>
+                              <AlertDialogAction onClick={() => handleDelete(deleteData)}>Continue</AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
+                      )}
+                      {location.pathname === "/data-retur" && <Timeline analyseId={row.retur_id} />}
                     </TableCell>
                   </TableRow>
                 ))

@@ -131,7 +131,7 @@ const UserTablePage = () => {
                     <TableCell className="text-left">{user.department.join(", ")}</TableCell>
                     <TableCell className="text-left flex gap-2">
                       <EditUser
-                        userId={user.sesa}
+                        sesa={user.sesa}
                         onRefresh={fetchUsers}
                       />
                       <AlertDialog>

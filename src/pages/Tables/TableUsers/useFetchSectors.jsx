@@ -11,9 +11,10 @@ const useFetchSectors = () => {
       try {
         const response = await axios.get("https://api-siexpert.vercel.app/api/sectors");
         setSectors(response.data);
-        setLoading(false);
-      } catch (err) {
-        setError(err);
+        setError(null);
+      } catch (error) {
+        setError(error);
+      } finally {
         setLoading(false);
       }
     };

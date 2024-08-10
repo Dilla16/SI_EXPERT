@@ -46,7 +46,7 @@ const TambahSector = ({ onRefresh }) => {
     } catch (error) {
       toast({
         title: "Error",
-        description: "Failed to add sector.",
+        description: error.response.data.message,
         variant: "destructive",
         className: "text-left",
       });

@@ -15,13 +15,13 @@ const useCreateProduct = (url) => {
   const [error, setError] = useState(null);
 
   const createProduct = async (productData) => {
-    const token = localStorage.getItem("token"); // Retrieve token from local storage
+    const token = localStorage.getItem("token");
 
     try {
       setLoading(true);
       const response = await axios.post(url, productData, {
         headers: {
-          Authorization: `Bearer ${token}`, // Include token in headers
+          Authorization: `Bearer ${token}`,
         },
       });
       setLoading(false);
@@ -81,7 +81,7 @@ const TambahProduk = ({ onRefresh }) => {
   const onSubmit = async (formData) => {
     try {
       const { ...productData } = formData;
-      await createProduct(productData); // Pass the product data to createProduct
+      await createProduct(productData);
       toast({
         title: "Success",
         description: "Product has been successfully added.",
@@ -93,7 +93,7 @@ const TambahProduk = ({ onRefresh }) => {
     } catch (error) {
       toast({
         title: "Error",
-        description: "Failed to add product.",
+        description: "Data Product must fill out!",
         variant: "destructive",
         className: "text-left",
       });
@@ -236,9 +236,8 @@ const TambahProduk = ({ onRefresh }) => {
   );
 };
 
-// PropTypes validation
 TambahProduk.propTypes = {
-  onRefresh: PropTypes.func.isRequired, // Validate onRefresh as a required function
+  onRefresh: PropTypes.func.isRequired,
 };
 
 export default TambahProduk;

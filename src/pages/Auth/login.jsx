@@ -10,13 +10,14 @@ import { Card, CardContent } from "@/components/ui/card";
 import { EyeIcon, EyeOffIcon } from "lucide-react";
 import axios from "axios";
 import { useToast } from "@/components/ui/use-toast";
+import { Toaster } from "@/components/ui/toaster";
 
 const formSchema = z.object({
-  sesa: z.string().min(2, {
-    message: "Sesa must be at least 2 characters.",
+  sesa: z.string().min(1, {
+    message: "Please fill out!.",
   }),
-  password: z.string().min(6, {
-    message: "Password must be at least 6 characters.",
+  password: z.string().min(1, {
+    message: "Please fill out!",
   }),
 });
 
@@ -40,18 +41,19 @@ export function Login() {
       localStorage.setItem("token", res.data.data.token);
       toast({
         title: "Success",
-        description: "You've login successfully!",
+        description: "You've logged in successfully!",
         className: "text-left",
         variant: "success",
       });
       navigate("/");
     } catch (err) {
-      const errorMessage = err.response?.data?.message || "An unexpected error occurred";
-
+      const errorMessage = err.response.data.message;
+      console.log(errorMessage);
       toast({
         title: "Error",
         description: errorMessage,
-        status: "error",
+        className: "text-left",
+        variant: "destructive",
       });
     }
   };
@@ -142,6 +144,7 @@ export function Login() {
           </CardContent>
         </Card>
       </div>
+      <Toaster />
     </div>
   );
 }

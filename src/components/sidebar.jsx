@@ -7,6 +7,7 @@ import { LayoutDashboard, Users, ArchiveRestore, Settings, LogOut, FolderKanban,
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { useToast } from "@/components/ui/use-toast";
+import { useUser } from "../pages/Tables/TableUsers/userContext";
 
 const Sidebar = ({ activeMenu, setActiveMenu }) => {
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 1024);
@@ -14,6 +15,7 @@ const Sidebar = ({ activeMenu, setActiveMenu }) => {
   const location = useLocation();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { role } = useUser();
 
   const logout = useCallback(async () => {
     try {
@@ -33,8 +35,8 @@ const Sidebar = ({ activeMenu, setActiveMenu }) => {
   const Menus = useMemo(
     () => [
       { title: "Dashboard", src: <LayoutDashboard className="w-5" />, link: "/" },
-      { title: "Data User", src: <Users className="w-5" />, link: "/data-user", gap: true },
-      { title: "Data Product", src: <FolderKanban className="w-5" />, link: "/data-products" },
+      { title: "Data User", src: <Users className="w-5" />, link: "/data-user", role: "Superadmin", gap: true },
+      { title: "Data Product", src: <FolderKanban className="w-5" />, link: "/data-products", role: "Admin" },
       { title: "Data Retur", src: <ArchiveRestore className="w-5" />, link: "/data-retur" },
       { title: "Setting", src: <Settings className="w-5" />, link: "/settings", gap: true },
       { title: "Logout", src: <LogOut className="w-5" />, link: "/login", action: logout },
@@ -79,7 +81,7 @@ const Sidebar = ({ activeMenu, setActiveMenu }) => {
             </SheetHeader>
             <div className="mt-4">
               <ul className="cursor-pointer text-xs text-left">
-                {Menus.map((Menu, index) =>
+                {Menus.filter((menu) => !menu.role || menu.role === role).map((Menu, index) =>
                   Menu.dropdown ? (
                     <li
                       key={index}
@@ -150,7 +152,7 @@ const Sidebar = ({ activeMenu, setActiveMenu }) => {
           </Link>
 
           <ul className="absolute top-28 pt-6 cursor-pointer transform">
-            {Menus.map((Menu, index) =>
+            {Menus.filter((menu) => !menu.role || menu.role === role).map((Menu, index) =>
               Menu.dropdown ? (
                 <TooltipProvider key={index}>
                   <Tooltip>

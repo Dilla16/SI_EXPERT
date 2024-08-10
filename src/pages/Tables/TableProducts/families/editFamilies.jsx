@@ -32,7 +32,7 @@ const EditFamily = ({ family, onRefresh }) => {
       sector_id: family?.sector_id || "",
     },
   });
-  const { updateFamily, error: updateError } = useUpdateFamily(`https://api-siexpert.vercel.app/api/families/${family.family_id}`);
+  const { updateFamily, error: updateError } = useUpdateFamily(`https://api-siexpert.vercel.app/api/families/${family?.family_id}`);
   const [sectors, setSectors] = useState([]);
   const [error, setError] = useState(null);
 
@@ -63,9 +63,9 @@ const EditFamily = ({ family, onRefresh }) => {
     }
   }, [family, setValue]);
 
-  const onSubmit = async (formData) => {
+  const onSubmit = async (data) => {
     try {
-      await updateFamily(formData);
+      await updateFamily(data);
       toast({
         title: "Success",
         description: "Family has been successfully updated.",
@@ -73,87 +73,67 @@ const EditFamily = ({ family, onRefresh }) => {
         className: "text-left",
       });
       reset();
-      onRefresh(); // Ensure onRefresh updates necessary state
-    } catch (error) {
+      onRefresh();
+    } catch (err) {
       toast({
         title: "Error",
         description: "Failed to update family.",
         variant: "destructive",
         className: "text-left",
       });
-      console.error("Error updating family:", error);
+      console.error("Error updating family:", err);
     }
   };
 
-  if (error || updateError) {
-    return <div>Error: {error?.message || updateError?.message}</div>;
-  }
+  if (error) return <div>Error fetching data: {error}</div>;
+  if (updateError) return <div>Error updating data: {updateError}</div>;
 
   return (
-    <DialogContent className="space-y-6">
+    <DialogContent>
       <DialogHeader>
-        <DialogTitle className="text-center">Edit Family</DialogTitle>
+        <DialogTitle className="text-center font-bold">Edit Family</DialogTitle>
       </DialogHeader>
-      <form
-        onSubmit={handleSubmit(onSubmit)}
-        className="space-y-4"
-      >
-        <div className="flex gap-3 items-center">
-          <Label
-            htmlFor="sector_id"
-            className="w-[30%]"
-          >
-            Sector
-          </Label>
-          <Select
-            onValueChange={(value) => setValue("sector_id", value)}
-            defaultValue={family?.sector_id}
-          >
-            <SelectTrigger className="h-8">
-              <SelectValue placeholder="Select a sector" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectGroup>
-                <SelectLabel>Sectors</SelectLabel>
-                {sectors.map((sector) => (
-                  <SelectItem
-                    key={sector.sector_id}
-                    value={sector.sector_id}
-                  >
-                    {sector.sector_name}
-                  </SelectItem>
-                ))}
-              </SelectGroup>
-            </SelectContent>
-          </Select>
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <div className="my-4 flex flex-col gap-4">
+          <div className="flex flex-col space-y-2">
+            <Label htmlFor="sector_id">Sector ID</Label>
+            <Select
+              id="sector_id"
+              defaultValue={family?.sector_id || ""}
+              {...register("sector_id", { required: true })}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select a sector" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup>
+                  <SelectLabel>Sectors</SelectLabel>
+                  {sectors.map((sector) => (
+                    <SelectItem
+                      key={sector.sector_id}
+                      value={sector.sector_id}
+                    >
+                      {sector.sector_name}
+                    </SelectItem>
+                  ))}
+                </SelectGroup>
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="flex flex-col space-y-2">
+            <Label htmlFor="family_name">Family Name</Label>
+            <Input
+              id="family_name"
+              {...register("family_name", { required: true })}
+            />
+          </div>
         </div>
-        <div className="flex gap-3 items-center">
-          <Label
-            htmlFor="family_name"
-            className="w-[30%]"
-          >
-            Family Name
-          </Label>
-          <Input
-            id="family_name"
-            type="text"
-            name="family_name"
-            className="col-span-1 h-8"
-            {...register("family_name", { required: true })}
-          />
-        </div>
-
-        <DialogFooter className="justify-center">
+        <DialogFooter className="justify-center mt-2">
           <DialogClose
             asChild
-            className="mx-auto w-1/3 mt-4"
+            className="mx-auto mt-2"
           >
-            <Button
-              type="submit"
-              className="mt-4"
-            >
-              Submit
-            </Button>
+            <Button type="submit">Save Changes</Button>
           </DialogClose>
         </DialogFooter>
       </form>
@@ -164,10 +144,10 @@ const EditFamily = ({ family, onRefresh }) => {
 // PropTypes validation
 EditFamily.propTypes = {
   family: PropTypes.shape({
-    family_id: PropTypes.string.isRequired,
-    family_name: PropTypes.string.isRequired,
-    sector_id: PropTypes.string.isRequired,
-  }).isRequired,
+    family_id: PropTypes.string,
+    family_name: PropTypes.string,
+    sector_id: PropTypes.string,
+  }),
   onRefresh: PropTypes.func.isRequired,
 };
 

@@ -10,6 +10,8 @@ import DataRetur from "./pages/Tables/TableRetur/setTableRetur";
 import Sidebar from "./components/sidebar";
 import NotFoundPage from "./pages/404";
 import "./App.css";
+import MainDetail from "./pages/Tables/TableRetur/mainDetail";
+import { UserProvider } from "./pages/Tables/TableUsers/userContext";
 
 function App() {
   const [activeMenu, setActiveMenu] = useState("Dashboard");
@@ -38,50 +40,57 @@ function App() {
 
   return (
     <Router>
-      <Layout>
-        <Routes>
-          <Route
-            path="/"
-            element={
-              <DashboardLayout activeMenu={activeMenu}>
-                <Dashboard />
-              </DashboardLayout>
-            }
-          />
-          <Route
-            path="/data-user"
-            element={
-              <DashboardLayout activeMenu={activeMenu}>
-                <DataUser />
-              </DashboardLayout>
-            }
-          />
-          <Route
-            path="/data-products"
-            element={
-              <DashboardLayout activeMenu={activeMenu}>
-                <DataProduct />
-              </DashboardLayout>
-            }
-          />
-          <Route
-            path="/data-retur"
-            element={<DashboardLayout activeMenu={activeMenu}>{<DataRetur />}</DashboardLayout>}
-          />
-          <Route
-            path="/*"
-            element={
-              <DashboardLayout activeMenu={activeMenu}>
-                <NotFoundPage />
-              </DashboardLayout>
-            }
-          />
-          <Route
-            path="/login"
-            element={<Login />}
-          />
-        </Routes>
-      </Layout>
+      <UserProvider>
+        <Layout>
+          <Routes>
+            <Route
+              path="/"
+              element={
+                <DashboardLayout activeMenu={activeMenu}>
+                  <Dashboard />
+                </DashboardLayout>
+              }
+            />
+            <Route
+              path="/data-user"
+              element={
+                <DashboardLayout activeMenu={activeMenu}>
+                  <DataUser />
+                </DashboardLayout>
+              }
+            />
+            <Route
+              path="/data-products"
+              element={
+                <DashboardLayout activeMenu={activeMenu}>
+                  <DataProduct />
+                </DashboardLayout>
+              }
+            />
+            <Route
+              path="/data-retur"
+              element={<DashboardLayout activeMenu={activeMenu}>{<DataRetur />}</DashboardLayout>}
+            />
+            <Route
+              path="/data-retur/detail/:id"
+              element={<DashboardLayout activeMenu={activeMenu}>{<MainDetail />}</DashboardLayout>}
+            />
+            <Route
+              path="/*"
+              element={
+                <DashboardLayout activeMenu={activeMenu}>
+                  <NotFoundPage />
+                </DashboardLayout>
+              }
+            />
+
+            <Route
+              path="/login"
+              element={<Login />}
+            />
+          </Routes>
+        </Layout>
+      </UserProvider>
     </Router>
   );
 }

@@ -13,11 +13,16 @@ import { useState, useEffect } from "react";
 const useCreateReturn = (url) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const token = localStorage.getItem("token");
 
   const createReturn = async (returnData) => {
     try {
       setLoading(true);
-      const response = await axios.post(url, returnData);
+      const response = await axios.post(url, returnData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       setLoading(false);
       return response.data;
     } catch (err) {
@@ -42,6 +47,8 @@ const TambahRetur = ({ onRefresh }) => {
 
   const selectedSector = watch("sector");
   const selectedFamily = watch("family_id");
+
+  const token = localStorage.getItem("token");
 
   useEffect(() => {
     const fetchSectors = async () => {
@@ -97,13 +104,20 @@ const TambahRetur = ({ onRefresh }) => {
 
   const onSubmit = async (formData) => {
     try {
-      const { quantity, ...rest } = formData;
+      const { retur_no, customer_name, country, product_name, qty, serial_no, issue } = formData;
       const returnData = {
-        qty: quantity,
-        ...rest,
+        returnData: {
+          retur_no,
+          customer_name,
+          country,
+          product_name,
+          qty,
+          serial_no,
+          issue,
+        },
       };
       console.log(returnData);
-      await createReturn(returnData);
+      await createReturn(returnData, token);
       toast({
         title: "Success",
         description: "Return data has been successfully added.",
@@ -257,21 +271,21 @@ const TambahRetur = ({ onRefresh }) => {
             </div>
             <div className="grid grid-cols-5 items-center gap-4">
               <Label
-                htmlFor="product_id"
+                htmlFor="product_name"
                 className="col-span-1"
               >
                 Product
               </Label>
               <Controller
-                name="product_id"
+                name="product_name"
                 control={control}
                 defaultValue=""
                 render={({ field: { onChange, value } }) => (
                   <Select
                     onValueChange={onChange}
                     value={value}
-                    id="product_id"
-                    className="col-span-"
+                    id="product_name"
+                    className="col-span-4"
                     disabled={isProductDisabled}
                   >
                     <SelectTrigger>
@@ -280,7 +294,7 @@ const TambahRetur = ({ onRefresh }) => {
                     <SelectContent>
                       {products.map((product) => (
                         <SelectItem
-                          key={product.index}
+                          key={product.product_id}
                           value={product.product_name}
                         >
                           {product.product_name}
@@ -293,16 +307,16 @@ const TambahRetur = ({ onRefresh }) => {
             </div>
             <div className="grid grid-cols-5 items-center gap-4">
               <Label
-                htmlFor="quantity"
+                htmlFor="qty"
                 className="col-span-1"
               >
                 Quantity
               </Label>
               <Input
-                id="quantity"
+                id="qty"
                 type="number"
                 className="col-span-4"
-                {...register("quantity", { required: true, valueAsNumber: true })}
+                {...register("qty", { required: true, valueAsNumber: true })}
               />
             </div>
             <div className="grid grid-cols-5 items-center gap-4">
@@ -334,9 +348,9 @@ const TambahRetur = ({ onRefresh }) => {
               />
             </div>
           </div>
-          <DialogFooter>
+          <DialogFooter className="mt-4">
             <DialogClose asChild>
-              <Button type="submit">Save</Button>
+              <Button type="submit">Submit</Button>
             </DialogClose>
           </DialogFooter>
         </form>

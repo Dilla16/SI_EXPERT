@@ -71,6 +71,7 @@ const TambahDataUser = ({ onRefresh }) => {
       await createUser(dataToSubmit);
       toast({
         title: "Success",
+        className: "text-left",
         description: "Data has been successfully added.",
         variant: "success",
       });
@@ -78,10 +79,11 @@ const TambahDataUser = ({ onRefresh }) => {
       setSelectedDepartments([]);
       onRefresh();
     } catch (error) {
-      console.error("Error submitting data:", error); // Log the error details
+      console.log("Error submitting data:", error); // Log the error details
       toast({
         title: "Error",
-        description: `Failed to add data: ${error.message}`,
+        className: "text-left",
+        description: `Failed to add data: ${error.response.data.message}`,
         variant: "destructive",
       });
     }

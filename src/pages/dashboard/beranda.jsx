@@ -1,11 +1,12 @@
-import DashboardCard from "@/components/chart";
+import DashboardCard from "./card";
+import Graph from "./graph";
 
 function Beranda() {
   return (
     <div>
       <div className="mt-4 flex flex-col items-start">
-        {/* Include DashboardCard here */}
         <DashboardCard />
+        <Graph />
       </div>
     </div>
   );
