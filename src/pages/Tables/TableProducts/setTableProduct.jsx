@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { useLocation } from "react-router-dom";
-import { Table, TableCaption, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
+import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
 import { Trash, Download } from "lucide-react";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import TambahProducts from "./tambahProduct";
@@ -9,7 +9,7 @@ import TableSectors from "./sectors/setTableSectors";
 import TableFamilies from "./families/setTableFamilies";
 import * as XLSX from "xlsx";
 import { Button } from "@/components/ui/button";
-import Timeline from "@/components/timeline";
+import Timeline from "../TableRetur/timeline";
 import Loading from "@/components/loading";
 import EditProduk from "./editProduct";
 import { toast } from "@/components/ui/use-toast";
@@ -150,31 +150,30 @@ const TableProduct = () => {
         </div>
         <div className="m-4">
           <Table className="w-full p-4">
-            <TableCaption>List of products.</TableCaption>
             <TableHeader>
               <TableRow>
-                <TableHead className="text-center">No</TableHead>
-                <TableHead className="text-center">Sector</TableHead>
-                <TableHead className="text-center">Family</TableHead>
-                <TableHead className="text-center">Product Code</TableHead>
-                <TableHead className="text-center">Product Name</TableHead>
-                <TableHead className="text-center">Created By</TableHead>
-                <TableHead className="text-center">Created At</TableHead>
-                <TableHead className="text-center">Action</TableHead>
+                <TableHead className="text-left">No</TableHead>
+                <TableHead className="text-left">Sector</TableHead>
+                <TableHead className="text-left">Family</TableHead>
+                <TableHead className="text-left">Product Code</TableHead>
+                <TableHead className="text-left">Product Name</TableHead>
+                <TableHead className="text-left">Created By</TableHead>
+                <TableHead className="text-left">Created At</TableHead>
+                <TableHead className="text-left">Action</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {data.length > 0 ? (
                 data.map((row, index) => (
                   <TableRow key={index}>
-                    <TableCell className="text-center">{index + 1}</TableCell>
-                    <TableCell className="text-center">{row.sector.sector_name}</TableCell>
-                    <TableCell className="text-center">{row.family.family_name}</TableCell>
-                    <TableCell className="text-center">{row.product_id}</TableCell>
-                    <TableCell className="text-center">{row.product_name}</TableCell>
-                    <TableCell className="text-center">{row.created_by}</TableCell>
-                    <TableCell className="text-center">{row.created_at}</TableCell>
-                    <TableCell className="text-center justify-center flex gap-2">
+                    <TableCell className="text-left">{index + 1}</TableCell>
+                    <TableCell className="text-left">{row.sector.sector_name}</TableCell>
+                    <TableCell className="text-left">{row.family.family_name}</TableCell>
+                    <TableCell className="text-left">{row.product_id}</TableCell>
+                    <TableCell className="text-left">{row.product_name}</TableCell>
+                    <TableCell className="text-left">{row.created_by}</TableCell>
+                    <TableCell className="text-left">{row.created_at}</TableCell>
+                    <TableCell className="text-left justify-start flex gap-2">
                       <EditProduk
                         product_id={row.product_id}
                         onRefresh={handleRefresh}

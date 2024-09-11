@@ -192,6 +192,7 @@ const TambahDataUser = ({ onRefresh }) => {
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="Superadmin">Superadmin</SelectItem>
+                      <SelectItem value="Engineer">Engineer</SelectItem>
                       <SelectItem value="Admin">Admin</SelectItem>
                       <SelectItem value="User">User</SelectItem>
                     </SelectContent>

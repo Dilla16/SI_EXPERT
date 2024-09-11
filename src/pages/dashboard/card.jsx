@@ -1,31 +1,44 @@
 import { useEffect, useState } from "react";
+import axios from "axios";
 import { BarChartBig } from "lucide-react";
 import { Card } from "../../components/ui/card";
 
 const DashboardCard = () => {
   const [rtaMetrics, setRtaMetrics] = useState({
-    rta: 123,
-    rtaProgress: 45,
-    rtaComplete: 78,
+    total_return: 0,
+    signed: 0,
+    submitted: 0,
+    closed: 0,
   });
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setRtaMetrics({
-        rta: Math.floor(Math.random() * 100),
-        rtaProgress: Math.floor(Math.random() * 50),
-        rtaComplete: Math.floor(Math.random() * 50),
+  const fetchMetrics = async () => {
+    const token = localStorage.getItem("token");
+    try {
+      const response = await axios.get("https://api-siexpert.vercel.app/api/return/stats", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       });
-    }, 5000); // Update every 5 seconds
+      setRtaMetrics(response.data);
+      console.log(response.data);
+    } catch (error) {
+      console.error("Error fetching return stats:", error.message || error);
+    }
+  };
 
-    return () => clearInterval(interval);
+  useEffect(() => {
+    fetchMetrics(); // Fetch data on component mount
+
+    const interval = setInterval(fetchMetrics, 30000); // Update every 30 seconds
+
+    return () => clearInterval(interval); // Clear interval on component unmount
   }, []);
 
   const metrics = [
-    { label: "Return To Analysis", value: rtaMetrics.rta },
-    { label: "RTA In Progress", value: rtaMetrics.rtaProgress },
-    { label: "RTA Submitted", value: rtaMetrics.rtaComplete },
-    { label: "RTA Completed", value: rtaMetrics.rta }, // Example of repeating or different metrics
+    { label: "Total Returns", value: rtaMetrics.total_return },
+    { label: "Signed", value: rtaMetrics.signed },
+    { label: "Submitted", value: rtaMetrics.submitted },
+    { label: "Closed", value: rtaMetrics.closed },
   ];
 
   return (
@@ -43,9 +56,9 @@ const DashboardCard = () => {
               </div>
             </div>
             <div className="grid justify-start">
-              <div className="text-4xl font-bold text-gray-800 text-start">{metric.value}</div>
+              <div className="text-4xl font-bold text-gray-800 text-start">{metric.value} </div>
             </div>
-            <div className="text-xs text-gray-400 text-left">+2 From Last Month</div>
+            <div className="text-xs text-gray-400 text-left">Pcs In Total</div>
           </Card>
         ))}
       </div>

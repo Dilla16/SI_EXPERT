@@ -6,11 +6,11 @@ import DashboardLayout from "./pages/dashboard/layout";
 import Login from "./pages/Auth/login";
 import DataUser from "./pages/Tables/TableUsers/setTableUser";
 import DataProduct from "./pages/Tables/TableProducts/setTableProduct";
-import DataRetur from "./pages/Tables/TableRetur/setTableRetur";
+import DataRetur from "./pages/Tables/TableRetur/dataRetur";
 import Sidebar from "./components/sidebar";
 import NotFoundPage from "./pages/404";
 import "./App.css";
-import MainDetail from "./pages/Tables/TableRetur/mainDetail";
+import MainDetail from "./pages/Tables/TableRetur/Details/mainDetail";
 import { UserProvider } from "./pages/Tables/TableUsers/userContext";
 
 function App() {

@@ -6,16 +6,17 @@ import { Label } from "@/components/ui/label";
 import { useForm, Controller } from "react-hook-form";
 import { toast } from "@/components/ui/use-toast";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { CirclePlus } from "lucide-react";
+import { CirclePlus, Trash } from "lucide-react";
 import axios from "axios";
 import { useState, useEffect } from "react";
+import countriesData from "./country.json";
 
 const useCreateReturn = (url) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const token = localStorage.getItem("token");
 
   const createReturn = async (returnData) => {
+    const token = localStorage.getItem("token");
     try {
       setLoading(true);
       const response = await axios.post(url, returnData, {
@@ -35,20 +36,20 @@ const useCreateReturn = (url) => {
   return { createReturn, loading, error };
 };
 
-const TambahRetur = ({ onRefresh }) => {
+const TambahRetur = () => {
   const { handleSubmit, register, control, reset, watch } = useForm();
-  const { createReturn } = useCreateReturn("https://api-siexpert.vercel.app/api/returns");
+  const { createReturn, loading } = useCreateReturn("https://api-siexpert.vercel.app/api/returns");
 
+  const [serialIssues, setSerialIssues] = useState([{ serial_no: "", issue: "" }]);
   const [sectors, setSectors] = useState([]);
   const [families, setFamilies] = useState([]);
   const [products, setProducts] = useState([]);
   const [isFamilyDisabled, setIsFamilyDisabled] = useState(true);
   const [isProductDisabled, setIsProductDisabled] = useState(true);
+  const countries = countriesData;
 
   const selectedSector = watch("sector");
   const selectedFamily = watch("family_id");
-
-  const token = localStorage.getItem("token");
 
   useEffect(() => {
     const fetchSectors = async () => {
@@ -102,22 +103,27 @@ const TambahRetur = ({ onRefresh }) => {
     }
   }, [selectedFamily]);
 
+  const addSerialIssue = () => setSerialIssues([...serialIssues, { serial_no: "", issue: "" }]);
+
+  const removeSerialIssue = (index) => setSerialIssues(serialIssues.filter((_, i) => i !== index));
+
+  const handleSerialIssueChange = (index, field, value) => {
+    setSerialIssues((prev) => prev.map((item, i) => (i === index ? { ...item, [field]: value } : item)));
+  };
+
   const onSubmit = async (formData) => {
     try {
-      const { retur_no, customer_name, country, product_name, qty, serial_no, issue } = formData;
+      const { retur_no, customer_name, country, product_name } = formData;
       const returnData = {
         returnData: {
           retur_no,
           customer_name,
           country,
           product_name,
-          qty,
-          serial_no,
-          issue,
+          serial_issues: serialIssues,
         },
       };
-      console.log(returnData);
-      await createReturn(returnData, token);
+      await createReturn(returnData);
       toast({
         title: "Success",
         description: "Return data has been successfully added.",
@@ -125,7 +131,8 @@ const TambahRetur = ({ onRefresh }) => {
         className: "text-left",
       });
       reset();
-      onRefresh();
+      setSerialIssues([{ serial_no: "", issue: "" }]);
+      // handleRefresh();
     } catch (error) {
       toast({
         title: "Error",
@@ -155,53 +162,109 @@ const TambahRetur = ({ onRefresh }) => {
           <DialogTitle className="text-center font-bold">ADD NEW RETURN</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit(onSubmit)}>
-          <div className="grid gap-4 py-4">
-            <div className="grid grid-cols-5 items-center gap-4">
+          <div className="grid grid-cols-3 gap-4 py-4">
+            <div className="col-span-1">
               <Label
                 htmlFor="retur_no"
-                className="col-span-1"
+                className="mb-2"
               >
                 Return No.
               </Label>
               <Input
                 id="retur_no"
                 type="text"
-                className="col-span-4"
                 {...register("retur_no", { required: true })}
+                className="mt-1"
               />
             </div>
-            <div className="grid grid-cols-5 items-center gap-4">
+            <div className="col-span-1">
               <Label
                 htmlFor="customer_name"
-                className="col-span-1"
+                className="mb-2"
               >
                 Customer Name
               </Label>
               <Input
                 id="customer_name"
                 type="text"
-                className="col-span-4"
                 {...register("customer_name", { required: true })}
+                className="mt-1"
               />
             </div>
-            <div className="grid grid-cols-5 items-center gap-4">
+            {/* <div className="col-span-1">
               <Label
                 htmlFor="country"
-                className="col-span-1"
+                className="mb-2"
               >
                 Country
               </Label>
-              <Input
-                id="country"
-                type="text"
-                className="col-span-4"
-                {...register("country", { required: true })}
+              <Controller
+                name="country"
+                control={control}
+                defaultValue=""
+                render={({ field: { onChange, value } }) => (
+                  <Select
+                    onValueChange={onChange}
+                    value={value}
+                    id="country"
+                    className="mt-1"
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select Country" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {countries.map(({ code, name }) => (
+                        <SelectItem
+                          key={code}
+                          value={code}
+                        >
+                          {name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              />
+            </div> */}
+            <div className="col-span-1">
+              <Label
+                htmlFor="country"
+                className="mb-2"
+              >
+                Country
+              </Label>
+              <Controller
+                name="country"
+                control={control}
+                defaultValue=""
+                render={({ field: { onChange, value } }) => (
+                  <Select
+                    onValueChange={onChange}
+                    value={value}
+                    id="country"
+                    className="mt-1"
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select Country" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {countries.map(({ code, name }) => (
+                        <SelectItem
+                          key={code}
+                          value={code}
+                        >
+                          {name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
               />
             </div>
-            <div className="grid grid-cols-5 items-center gap-4">
+            <div className="col-span-1">
               <Label
                 htmlFor="sector"
-                className="col-span-1"
+                className="mb-2"
               >
                 Sector
               </Label>
@@ -214,18 +277,18 @@ const TambahRetur = ({ onRefresh }) => {
                     onValueChange={onChange}
                     value={value}
                     id="sector"
-                    className="col-span-4"
+                    className="mt-1"
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="Select Sector" />
                     </SelectTrigger>
                     <SelectContent>
-                      {sectors.map((sector) => (
+                      {sectors.map(({ sector_id, sector_name }) => (
                         <SelectItem
-                          key={sector.sector_id}
-                          value={sector.sector_id}
+                          key={sector_id}
+                          value={sector_id}
                         >
-                          {sector.sector_name}
+                          {sector_name}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -233,10 +296,10 @@ const TambahRetur = ({ onRefresh }) => {
                 )}
               />
             </div>
-            <div className="grid grid-cols-5 items-center gap-4">
+            <div className="col-span-1">
               <Label
                 htmlFor="family_id"
-                className="col-span-1"
+                className="mb-2"
               >
                 Family
               </Label>
@@ -249,19 +312,19 @@ const TambahRetur = ({ onRefresh }) => {
                     onValueChange={onChange}
                     value={value}
                     id="family_id"
-                    className="col-span-4"
                     disabled={isFamilyDisabled}
+                    className="mt-1"
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="Select Family" />
                     </SelectTrigger>
                     <SelectContent>
-                      {families.map((family) => (
+                      {families.map(({ family_id, family_name }) => (
                         <SelectItem
-                          key={family.family_id}
-                          value={family.family_id}
+                          key={family_id}
+                          value={family_id}
                         >
-                          {family.family_name}
+                          {family_name}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -269,10 +332,10 @@ const TambahRetur = ({ onRefresh }) => {
                 )}
               />
             </div>
-            <div className="grid grid-cols-5 items-center gap-4">
+            <div className="col-span-1">
               <Label
                 htmlFor="product_name"
-                className="col-span-1"
+                className="mb-2"
               >
                 Product
               </Label>
@@ -285,19 +348,19 @@ const TambahRetur = ({ onRefresh }) => {
                     onValueChange={onChange}
                     value={value}
                     id="product_name"
-                    className="col-span-4"
                     disabled={isProductDisabled}
+                    className="mt-1"
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="Select Product" />
                     </SelectTrigger>
                     <SelectContent>
-                      {products.map((product) => (
+                      {products.map(({ product_name }) => (
                         <SelectItem
-                          key={product.product_id}
-                          value={product.product_name}
+                          key={product_name}
+                          value={product_name}
                         >
-                          {product.product_name}
+                          {product_name}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -305,52 +368,56 @@ const TambahRetur = ({ onRefresh }) => {
                 )}
               />
             </div>
-            <div className="grid grid-cols-5 items-center gap-4">
-              <Label
-                htmlFor="qty"
-                className="col-span-1"
-              >
-                Quantity
-              </Label>
-              <Input
-                id="qty"
-                type="number"
-                className="col-span-4"
-                {...register("qty", { required: true, valueAsNumber: true })}
-              />
-            </div>
-            <div className="grid grid-cols-5 items-center gap-4">
-              <Label
-                htmlFor="serial_no"
-                className="col-span-1"
-              >
-                Serial No.
-              </Label>
-              <Input
-                id="serial_no"
-                type="text"
-                className="col-span-4"
-                {...register("serial_no", { required: true })}
-              />
-            </div>
-            <div className="grid grid-cols-5 items-center gap-4">
-              <Label
-                htmlFor="issue"
-                className="col-span-1"
-              >
-                Issue
-              </Label>
-              <Input
-                id="issue"
-                type="text"
-                className="col-span-4"
-                {...register("issue", { required: true })}
-              />
-            </div>
           </div>
-          <DialogFooter className="mt-4">
-            <DialogClose asChild>
-              <Button type="submit">Submit</Button>
+          <div className="py-4">
+            <Label className="block mb-2">Serial Numbers and Issues</Label>
+            {serialIssues.map((item, index) => (
+              <div
+                key={index}
+                className="flex gap-2 mb-2 items-center"
+              >
+                <Input
+                  placeholder="Serial Number"
+                  value={item.serial_no}
+                  onChange={(e) => handleSerialIssueChange(index, "serial_no", e.target.value)}
+                  className="mt-1"
+                />
+                <Input
+                  placeholder="Issue"
+                  value={item.issue}
+                  onChange={(e) => handleSerialIssueChange(index, "issue", e.target.value)}
+                  className="mt-1"
+                />
+                <Button
+                  type="button"
+                  onClick={() => removeSerialIssue(index)}
+                  variant="outline"
+                >
+                  <Trash className="w-4" />
+                </Button>
+              </div>
+            ))}
+            <Button
+              type="button"
+              onClick={addSerialIssue}
+              variant="outline"
+              className="flex items-center gap-2 mt-2"
+            >
+              <CirclePlus className="w-4" />
+              Add More
+            </Button>
+          </div>
+
+          <DialogFooter>
+            <DialogClose className="mx-auto w-1/3 mt-4">
+              <Button
+                type="submit"
+                disabled={loading}
+              >
+                {loading ? "Saving..." : "Save"}
+              </Button>
+
+              <Button variant="outline">Cancel</Button>
             </DialogClose>
           </DialogFooter>
         </form>
@@ -360,7 +427,7 @@ const TambahRetur = ({ onRefresh }) => {
 };
 
 TambahRetur.propTypes = {
-  onRefresh: PropTypes.func.isRequired,
+  handleRefresh: PropTypes.func.isRequired,
 };
 
 export default TambahRetur;

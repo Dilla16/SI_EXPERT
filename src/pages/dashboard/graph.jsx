@@ -1,77 +1,67 @@
 import { useState, useEffect } from "react";
 import { Bar, BarChart, CartesianGrid, XAxis } from "recharts"; // Import BarChart components
 import { ChartContainer, ChartLegend, ChartLegendContent, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
+import axios from "axios";
 
-// Utility function to get the last 6 months' names
-const getLastSixMonths = () => {
-  const now = new Date();
-  const months = [];
-  for (let i = 5; i >= 0; i--) {
-    const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
-    months.push(date.toLocaleString("default", { month: "long" }));
+// Fetch data from the API endpoint
+const fetchData = async () => {
+  try {
+    const response = await axios.get("https://api-siexpert.vercel.app/api/histories");
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching data:", error);
+    return {};
   }
-  return months;
 };
 
 const Graph = () => {
-  const lastSixMonths = getLastSixMonths();
-
-  const [graphData1, setGraphData1] = useState(
-    lastSixMonths.map((month) => ({
-      month,
-      rta: Math.floor(Math.random() * 200),
-      rtaProgress: Math.floor(Math.random() * 150),
-    }))
-  );
-
-  const [graphData2, setGraphData2] = useState(
-    lastSixMonths.map((month) => ({
-      month,
-      rtaSubmitted: Math.floor(Math.random() * 100),
-      rtaCompleted: Math.floor(Math.random() * 100),
-    }))
-  );
+  const [data1, setData1] = useState([]);
+  const [data2, setData2] = useState([]);
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      setGraphData1((prevData) =>
-        prevData.map((item) => ({
-          ...item,
-          rta: item.rta + Math.floor(Math.random() * 10),
-          rtaProgress: item.rtaProgress + Math.floor(Math.random() * 10),
-        }))
-      );
+    const getData = async () => {
+      const data = await fetchData();
 
-      setGraphData2((prevData) =>
-        prevData.map((item) => ({
-          ...item,
-          rtaSubmitted: item.rtaSubmitted + Math.floor(Math.random() * 10),
-          rtaCompleted: item.rtaCompleted + Math.floor(Math.random() * 10),
-        }))
-      );
-    }, 5000);
+      // Filter months from April to September
+      const months = ["Apr 2024", "May 2024", "Jun 2024", "Jul 2024", "Aug 2024", "Sep 2024"];
 
-    return () => clearInterval(interval);
+      const data1Formatted = months.map((month) => ({
+        month,
+        created: parseInt(data[month]?.created || "0", 10),
+        closed: parseInt(data[month]?.closed || "0", 10),
+      }));
+
+      const data2Formatted = months.map((month) => ({
+        month,
+        submitted: parseInt(data[month]?.submitted || "0", 10),
+        closed: parseInt(data[month]?.closed || "0", 10),
+      }));
+
+      setData1(data1Formatted);
+      setData2(data2Formatted);
+    };
+
+    getData();
   }, []);
 
   const chartConfig1 = {
-    rta: {
-      label: "Return To Analysis",
+    created: {
+      label: "Return to Analysis",
       color: "#2563eb",
     },
-    rtaProgress: {
-      label: "RTA In Progress",
+    closed: {
+      label: "Analysis",
       color: "#60a5fa",
     },
   };
 
   const chartConfig2 = {
-    rtaSubmitted: {
-      label: "RTA Submitted",
+    submitted: {
+      label: "Submitted",
       color: "#f59e0b",
     },
-    rtaCompleted: {
-      label: "RTA Completed",
+    closed: {
+      label: "Closed",
       color: "#10b981",
     },
   };
@@ -85,7 +75,7 @@ const Graph = () => {
             className="h-[100%] w-full p-6"
           >
             <BarChart
-              data={graphData1}
+              data={data1}
               margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
             >
               <CartesianGrid
@@ -102,13 +92,13 @@ const Graph = () => {
               <ChartTooltip content={<ChartTooltipContent />} />
               <ChartLegend content={<ChartLegendContent />} />
               <Bar
-                dataKey="rta"
-                fill={chartConfig1.rta.color}
+                dataKey="created"
+                fill={chartConfig1.created.color}
                 radius={[4, 4, 0, 0]}
               />
               <Bar
-                dataKey="rtaProgress"
-                fill={chartConfig1.rtaProgress.color}
+                dataKey="closed"
+                fill={chartConfig1.closed.color}
                 radius={[4, 4, 0, 0]}
               />
             </BarChart>
@@ -121,7 +111,7 @@ const Graph = () => {
             className="h-[100%] w-full p-6"
           >
             <BarChart
-              data={graphData2}
+              data={data2}
               margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
             >
               <CartesianGrid
@@ -138,13 +128,13 @@ const Graph = () => {
               <ChartTooltip content={<ChartTooltipContent />} />
               <ChartLegend content={<ChartLegendContent />} />
               <Bar
-                dataKey="rtaSubmitted"
-                fill={chartConfig2.rtaSubmitted.color}
+                dataKey="submitted"
+                fill={chartConfig2.submitted.color}
                 radius={[4, 4, 0, 0]}
               />
               <Bar
-                dataKey="rtaCompleted"
-                fill={chartConfig2.rtaCompleted.color}
+                dataKey="closed"
+                fill={chartConfig2.closed.color}
                 radius={[4, 4, 0, 0]}
               />
             </BarChart>

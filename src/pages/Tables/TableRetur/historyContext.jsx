@@ -1,12 +1,16 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import axios from "axios";
 import PropTypes from "prop-types";
+import { useParams } from "react-router-dom";
 
 const HistoryContext = createContext({
   history: [],
   signedInfo: { created_by: "", created_at: "" },
+  canEdit: false,
   loading: true,
   error: null,
+  analyzeId: null,
+  setAnalyzeId: () => {},
 });
 
 // eslint-disable-next-line react-refresh/only-export-components
@@ -14,47 +18,36 @@ export const useHistoryContext = () => {
   return useContext(HistoryContext);
 };
 
-export const HistoryProvider = ({ id, children }) => {
+export const HistoryProvider = ({ children }) => {
   const [history, setHistory] = useState([]);
-  const [signedInfo, setSignedInfo] = useState({ created_by: "", created_at: "" });
+  const [signedInfo, setSignedInfo] = useState({
+    created_by: "",
+    created_at: "",
+  });
+  const [canEdit, setCanEdit] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [analyzeId, setAnalyzeId] = useState(null);
+
+  const { id } = useParams();
 
   useEffect(() => {
     const fetchHistory = async () => {
-      const token = localStorage.getItem("token");
-
+      setLoading(true);
       try {
-        const response = await axios.get(`https://api-siexpert.vercel.app/api/history/${id}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        // Fetch history and signed info
+        const historyResponse = await axios.get(`https://api-siexpert.vercel.app/api/history/${id}`);
+        setHistory(historyResponse.data.history);
+        setSignedInfo(historyResponse.data.signedInfo);
+        setAnalyzeId(statusResponse.data.analyse_id);
 
-        const historyData = Object.keys(response.data).reduce((acc, key) => {
-          const entry = response.data[key];
-          if (typeof entry === "object" && entry !== null && entry.history_id) {
-            acc.push(entry);
-          }
-          return acc;
-        }, []);
-
-        setHistory(historyData);
-
-        // Find the signed status entry
-        const signedEntry = historyData.find((entry) => entry.status === "signed");
-        if (signedEntry) {
-          setSignedInfo({
-            created_by: signedEntry.created_by,
-            created_at: signedEntry.created_at,
-          });
-        } else {
-          setSignedInfo({ created_by: "", created_at: "" });
-        }
+        // Fetch canEdit status and analyzeId
+        const statusResponse = await axios.get(`https://api-siexpert.vercel.app/api/retur/analysis/status/${id}`);
+        setCanEdit(statusResponse.data.canEdit);
 
         setError(null);
-      } catch (err) {
-        setError(err);
-        console.error("Error fetching history:", err);
-        setHistory([]);
+      } catch (error) {
+        setError(error);
       } finally {
         setLoading(false);
       }
@@ -63,12 +56,19 @@ export const HistoryProvider = ({ id, children }) => {
     fetchHistory();
   }, [id]);
 
-  return <HistoryContext.Provider value={{ history, signedInfo, loading, error }}>{children}</HistoryContext.Provider>;
+  const value = {
+    history,
+    signedInfo,
+    canEdit,
+    loading,
+    error,
+    analyzeId,
+    setAnalyzeId,
+  };
+
+  return <HistoryContext.Provider value={value}>{children}</HistoryContext.Provider>;
 };
 
 HistoryProvider.propTypes = {
-  id: PropTypes.string.isRequired,
   children: PropTypes.node.isRequired,
 };
-
-export default HistoryProvider;

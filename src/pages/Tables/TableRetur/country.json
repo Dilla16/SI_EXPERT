@@ -1,0 +1,23 @@
+[
+  { "code": "Argentina", "name": "Argentina" },
+  { "code": "Australia", "name": "Australia" },
+  { "code": "Brazil", "name": "Brazil" },
+  { "code": "Canada", "name": "Canada" },
+  { "code": "China", "name": "China" },
+  { "code": "France", "name": "France" },
+  { "code": "Germany", "name": "Germany" },
+  { "code": "India", "name": "India" },
+  { "code": "Italy", "name": "Italy" },
+  { "code": "Japan", "name": "Japan" },
+  { "code": "Mexico", "name": "Mexico" },
+  { "code": "Netherlands", "name": "Netherlands" },
+  { "code": "New Zealand", "name": "New Zealand" },
+  { "code": "Russia", "name": "Russia" },
+  { "code": "South Africa", "name": "South Africa" },
+  { "code": "South Korea", "name": "South Korea" },
+  { "code": "Spain", "name": "Spain" },
+  { "code": "Sweden", "name": "Sweden" },
+  { "code": "Switzerland", "name": "Switzerland" },
+  { "code": "United Kingdom", "name": "United Kingdom" },
+  { "code": "United States", "name": "United States" }
+]

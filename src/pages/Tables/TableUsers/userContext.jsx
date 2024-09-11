@@ -10,6 +10,7 @@ export const UserProvider = ({ children }) => {
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [role, setRole] = useState(null);
+  const [sesa, setSesa] = useState(null);
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -22,10 +23,15 @@ export const UserProvider = ({ children }) => {
       }
 
       try {
-        const res = await axios.get(`https://api-siexpert.vercel.app/api/profile`, { headers: { Authorization: `Bearer ${token}` } });
+        const res = await axios.get(`https://api-siexpert.vercel.app/api/profile`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
         setUserData(res.data);
         setRole(res.data.role);
+        setSesa(res.data.sesa);
       } catch (err) {
+        console.error("Error fetching profile:", err);
         if (err.response && err.response.data && err.response.data.details === "jwt expired") {
           toast({
             title: "Error",
@@ -44,7 +50,7 @@ export const UserProvider = ({ children }) => {
     fetchProfile();
   }, [navigate, toast]);
 
-  return <UserContext.Provider value={{ userData, loading, role }}>{children}</UserContext.Provider>;
+  return <UserContext.Provider value={{ userData, loading, role, sesa }}>{children}</UserContext.Provider>;
 };
 
 UserProvider.propTypes = {

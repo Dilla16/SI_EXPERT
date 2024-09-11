@@ -22,7 +22,7 @@ const Sidebar = ({ activeMenu, setActiveMenu }) => {
       localStorage.removeItem("token");
       toast({
         title: "Success",
-        description: "You've logout successfully!",
+        description: "You've logged out successfully!",
         className: "text-left",
         variant: "destructive",
       });
@@ -36,12 +36,13 @@ const Sidebar = ({ activeMenu, setActiveMenu }) => {
     () => [
       { title: "Dashboard", src: <LayoutDashboard className="w-5" />, link: "/" },
       { title: "Data User", src: <Users className="w-5" />, link: "/data-user", role: "Superadmin", gap: true },
-      { title: "Data Product", src: <FolderKanban className="w-5" />, link: "/data-products", role: "Admin" },
+      { title: "Data Product", src: <FolderKanban className="w-5" />, link: "/data-products", role: ["Admin", "Engineer"] },
       { title: "Data Retur", src: <ArchiveRestore className="w-5" />, link: "/data-retur" },
       { title: "Setting", src: <Settings className="w-5" />, link: "/settings", gap: true },
       { title: "Logout", src: <LogOut className="w-5" />, link: "/login", action: logout },
     ],
-    [logout]
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [logout, role]
   );
 
   useEffect(() => {
@@ -81,7 +82,7 @@ const Sidebar = ({ activeMenu, setActiveMenu }) => {
             </SheetHeader>
             <div className="mt-4">
               <ul className="cursor-pointer text-xs text-left">
-                {Menus.filter((menu) => !menu.role || menu.role === role).map((Menu, index) =>
+                {Menus.filter((menu) => !menu.role || menu.role.includes(role)).map((Menu, index) =>
                   Menu.dropdown ? (
                     <li
                       key={index}
@@ -152,7 +153,7 @@ const Sidebar = ({ activeMenu, setActiveMenu }) => {
           </Link>
 
           <ul className="absolute top-28 pt-6 cursor-pointer transform">
-            {Menus.filter((menu) => !menu.role || menu.role === role).map((Menu, index) =>
+            {Menus.filter((menu) => !menu.role || menu.role.includes(role)).map((Menu, index) =>
               Menu.dropdown ? (
                 <TooltipProvider key={index}>
                   <Tooltip>

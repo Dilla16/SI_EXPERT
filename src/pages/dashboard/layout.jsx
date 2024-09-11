@@ -7,8 +7,8 @@ import { Toaster } from "@/components/ui/toaster";
 
 const Layout = ({ children, activeMenu }) => {
   const location = useLocation();
-  const isHomePage = location.pathname === "/";
-  const showBreadcrumb = !(isHomePage || location.pathname === "/dashboard");
+  const isDashboardPage = location.pathname === "/";
+  const showBreadcrumb = !(location.pathname === "/" || isDashboardPage);
 
   return (
     <div className="flex flex-col w-full h-screen">
@@ -36,7 +36,7 @@ const Layout = ({ children, activeMenu }) => {
 
       {/* Render children */}
       <div className="flex flex-1 justify-center overflow-hidden me-6 mb-6">
-        <div className={`mt-4 me-4 mb-1  ms-8  w-full max-w-full ${isHomePage ? "bg-transparent" : "bg-white rounded-md shadow-md"}`}>{children}</div>
+        <div className={`w-full max-w-full ${isDashboardPage ? "bg-transparent ms-4" : "mb-1 mt-4 me-4 ms-8 bg-white rounded-md shadow-md"}`}>{children}</div>
       </div>
       <Toaster />
     </div>
