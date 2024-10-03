@@ -113,7 +113,7 @@ const TambahRetur = () => {
 
   const onSubmit = async (formData) => {
     try {
-      const { retur_no, customer_name, country, product_name } = formData;
+      const { retur_no, customer_name, country, product_name, sector } = formData;
       const returnData = {
         returnData: {
           retur_no,
@@ -121,8 +121,10 @@ const TambahRetur = () => {
           country,
           product_name,
           serial_issues: serialIssues,
+          sector,
         },
       };
+      console.log(returnData);
       await createReturn(returnData);
       toast({
         title: "Success",

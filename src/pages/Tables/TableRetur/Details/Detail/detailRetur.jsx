@@ -24,14 +24,12 @@ const DetailRetur = ({ id, isEditable, setIsEditingDetails }) => {
       const token = localStorage.getItem("token");
 
       try {
-        // Fetch return details
         const response = await axios.get(`https://api-siexpert.vercel.app/api/returns/${id}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
-        setData(response.data);
-        setInitialData(response.data); // Save initial data
+        setData(response.data.returnData);
+        setInitialData(response.data.returnData);
 
-        // Fetch lists for sectors, families, and products
         const [sectorsResponse, familiesResponse, productsResponse] = await Promise.all([
           axios.get("https://api-siexpert.vercel.app/api/sectors", { headers: { Authorization: `Bearer ${token}` } }),
           axios.get("https://api-siexpert.vercel.app/api/families", { headers: { Authorization: `Bearer ${token}` } }),

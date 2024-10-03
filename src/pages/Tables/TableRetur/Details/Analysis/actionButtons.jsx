@@ -23,7 +23,7 @@ const ActionButtons = ({ handleSave, role, canEdit, haveSubmitted, signed, appro
   const [isDialogOpen, setDialogOpen] = useState(false);
   const [comment, setComment] = useState(""); // State for comment
   const [images, setImages] = useState([{ image: null, caption: "" }]);
-  const [dialogType, setDialogType] = useState(""); // To track the type of dialog (approve or reject)
+  const [dialogType, setDialogType] = useState("");
 
   const handleStartClick = async () => {
     try {
@@ -211,68 +211,72 @@ const ActionButtons = ({ handleSave, role, canEdit, haveSubmitted, signed, appro
       return (
         <div className="flex justify-center items-center gap-4 mt-4">
           <DownloadButton id={retur_id} />
-          <AlertDialog>
-            <AlertDialogTrigger>
-              <Button
-                onClick={openApprovalDialog}
-                className="bg-success hover:bg-green-600 px-4 py-2 text-white"
-              >
-                Approve
-              </Button>
-            </AlertDialogTrigger>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>Approve Analysis</AlertDialogTitle>
-                <AlertDialogDescription>Please provide a comment for the approval.</AlertDialogDescription>
-                <Textarea
-                  placeholder="Enter your comment"
-                  value={comment}
-                  onChange={(e) => setComment(e.target.value)}
-                  className="mt-2"
-                />
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                <AlertDialogAction
-                  onClick={confirmDecision}
-                  className="bg-success hover:bg-green-600"
-                >
-                  Approve Analyze
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
-          <AlertDialog>
-            <AlertDialogTrigger>
-              <Button
-                onClick={openRejectionDialog}
-                className="bg-red-500 hover:bg-red-600 px-4 py-2 text-white"
-              >
-                Reject
-              </Button>
-            </AlertDialogTrigger>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>Reject Analysis</AlertDialogTitle>
-                <AlertDialogDescription>Please provide a comment for the rejection.</AlertDialogDescription>
-                <Textarea
-                  placeholder="Enter your comment"
-                  value={comment}
-                  onChange={(e) => setComment(e.target.value)}
-                  className="mt-2"
-                />
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                <AlertDialogAction
-                  onClick={confirmDecision}
-                  className="bg-red-500 hover:bg-red-600"
-                >
-                  Reject Analysis
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
+          {haveSubmitted === true && approved !== true && (
+            <>
+              <AlertDialog>
+                <AlertDialogTrigger>
+                  <Button
+                    onClick={openApprovalDialog}
+                    className="bg-success hover:bg-green-600 px-4 py-2 text-white"
+                  >
+                    Approve
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Approve Analysis</AlertDialogTitle>
+                    <AlertDialogDescription>Please provide a comment for the approval.</AlertDialogDescription>
+                    <Textarea
+                      placeholder="Enter your comment"
+                      value={comment}
+                      onChange={(e) => setComment(e.target.value)}
+                      className="mt-2"
+                    />
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction
+                      onClick={confirmDecision}
+                      className="bg-success hover:bg-green-600"
+                    >
+                      Approve Analyze
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+              <AlertDialog>
+                <AlertDialogTrigger>
+                  <Button
+                    onClick={openRejectionDialog}
+                    className="bg-red-500 hover:bg-red-600 px-4 py-2 text-white"
+                  >
+                    Reject
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Reject Analysis</AlertDialogTitle>
+                    <AlertDialogDescription>Please provide a comment for the rejection.</AlertDialogDescription>
+                    <Textarea
+                      placeholder="Enter your comment"
+                      value={comment}
+                      onChange={(e) => setComment(e.target.value)}
+                      className="mt-2"
+                    />
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction
+                      onClick={confirmDecision}
+                      className="bg-red-500 hover:bg-red-600"
+                    >
+                      Reject Analysis
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            </>
+          )}
         </div>
       );
     }

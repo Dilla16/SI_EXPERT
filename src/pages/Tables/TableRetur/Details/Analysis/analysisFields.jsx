@@ -4,11 +4,10 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 
 const AnalysisFields = ({ data, isEditingAnalysis, setDataAnalysis }) => {
-  // Handle form input changes
   const handleChange = (id, value) => {
     setDataAnalysis((prevData) => ({
       ...prevData,
-      [id]: value,
+      [id]: value.toUpperCase(),
     }));
   };
 

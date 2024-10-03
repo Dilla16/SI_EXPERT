@@ -20,7 +20,6 @@ const DashboardCard = () => {
         },
       });
       setRtaMetrics(response.data);
-      console.log(response.data);
     } catch (error) {
       console.error("Error fetching return stats:", error.message || error);
     }

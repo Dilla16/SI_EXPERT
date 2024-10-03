@@ -1,6 +1,5 @@
 import PropTypes from "prop-types";
 import { PDFDocument, rgb, StandardFonts } from "pdf-lib";
-import { saveAs } from "file-saver";
 import { Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -88,14 +87,6 @@ const generatePDF = async (id) => {
     drawText(`Retur ID: ${returnData.retur_id || "N/A"}`, `Retur No: ${returnData.retur_no || "N/A"}`, yPosition);
     yPosition -= 30;
 
-    // Customer Information Section
-    drawSectionTitle("CUSTOMER INFORMATION", yPosition);
-    yPosition -= 30;
-    drawText(`Customer Name: ${returnData.customer_name || "N/A"}`, null, yPosition);
-    yPosition -= 20;
-    drawText(`Country: ${returnData.country || "N/A"}`, null, yPosition);
-    yPosition -= 30;
-
     // Product Information Section
     drawSectionTitle("PRODUCT INFORMATION", yPosition);
     yPosition -= 30;
@@ -109,6 +100,14 @@ const generatePDF = async (id) => {
     drawText(`Quantity: ${returnData.qty || "N/A"}`, `Serial No: ${returnData.serial_no || "N/A"}`, yPosition);
     yPosition -= 20;
     drawText(`Issue: ${returnData.issue || "N/A"}`, null, yPosition);
+    yPosition -= 30;
+
+    // Customer Information Section
+    drawSectionTitle("CUSTOMER INFORMATION", yPosition);
+    yPosition -= 30;
+    drawText(`Customer Name: ${returnData.customer_name || "N/A"}`, null, yPosition);
+    yPosition -= 20;
+    drawText(`Country: ${returnData.country || "N/A"}`, null, yPosition);
     yPosition -= 30;
 
     // Analysis Data Section
@@ -126,55 +125,26 @@ const generatePDF = async (id) => {
     drawText(`Action: ${analysis.action || "N/A"}`, `Category: ${analysis.category || "N/A"}`, yPosition);
     yPosition -= 30;
 
-    // // History Section
-    // drawSectionTitle("HISTORY", yPosition);
-    // yPosition -= 30;
-    // const historyEntries = Array.isArray(historyData) ? historyData : [];
-    // historyEntries.forEach((entry) => {
-    //   const statusMap = {
-    //     created: "Created By",
-    //     signed: "Analyzed By",
-    //     submitted: "Submitted By",
-    //     approved: "Approved By",
-    //     closed: "Closed By",
-    //   };
-    //   const statusLabel = statusMap[entry.status] || "Unknown Status";
-    //   const date = entry.created_at ? new Date(entry.created_at).toLocaleDateString() : "N/A";
-    //   drawText(`${statusLabel}: ${entry.created_by || "N/A"}`, `Date: ${date}`, yPosition);
-    //   yPosition -= 20;
-    // });
-    // yPosition -= 30;
-
-    // // Images Section
-    // drawSectionTitle("IMAGES", yPosition);
-    // yPosition -= 30;
-    // if (Array.isArray(returnData.analysis?.images) && returnData.analysis.images.length > 0) {
-    //   returnData.analysis.images.forEach((image, index) => {
-    //     drawText(`Image ${index + 1}: ${image || "N/A"}`, null, yPosition);
-    //     yPosition -= 20;
-    //   });
-    // }
-    // if (returnData.analysis?.caption) {
-    //   drawText(`Caption: ${returnData.analysis.caption || "N/A"}`, null, yPosition);
-    //   yPosition -= 30;
-    // }
-
-    // Save the PDF document
+    // Save the PDF document and open it in a new window for preview
     const pdfBytes = await pdfDoc.save();
-    const fileName = `${returnData.retur_no || "return"}_${returnData.products?.product_name || "product"}_${returnData.serial_no || "serial_no"}.pdf`;
-    saveAs(new Blob([pdfBytes], { type: "application/pdf" }), fileName);
+    const pdfBlob = new Blob([pdfBytes], { type: "application/pdf" });
+    const pdfUrl = URL.createObjectURL(pdfBlob);
+
+    // Open the PDF in a new window for preview
+    window.open(pdfUrl, "_blank");
   } catch (error) {
     console.error("Error generating PDF:", error);
   }
 };
 
+// Button component to trigger PDF preview
 const DownloadButton = ({ id }) => (
   <Button
     onClick={() => generatePDF(id)}
     className="bg-blue-500 hover:bg-blue-600 px-4 py-2 text-white flex gap-2 items-center"
   >
     <Download className="w-5" />
-    Download Analysis
+    Preview
   </Button>
 );
 

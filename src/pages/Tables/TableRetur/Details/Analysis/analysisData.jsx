@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 const useAnalysisData = ({ id, isEditingAnalysis, setIsEditingAnalysis, toast }) => {
   const [data, setData] = useState(null);
@@ -12,13 +13,14 @@ const useAnalysisData = ({ id, isEditingAnalysis, setIsEditingAnalysis, toast })
   const [signed, setSigned] = useState(false);
   const [analyzeId, setAnalyzeId] = useState(null);
   const token = localStorage.getItem("token");
+  const navigate = useNavigate();
 
   const fetchReturnData = useCallback(async () => {
     try {
       const response = await axios.get(`https://api-siexpert.vercel.app/api/returns/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      setAnalyzeId(response.data.analysis.analyze_id);
+      setAnalyzeId(response.data.returnData.analysis.analyze_id);
     } catch (error) {
       console.error("Error fetching return data:", error);
       setError(error);
@@ -43,22 +45,20 @@ const useAnalysisData = ({ id, isEditingAnalysis, setIsEditingAnalysis, toast })
   }, [analyzeId, token]);
 
   const fetchStatusData = useCallback(async () => {
-    if (analyzeId) {
-      try {
-        const statusResponse = await axios.get(`https://api-siexpert.vercel.app/api/retur/analysis/status/${id}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        setCanEdit(statusResponse.data.canEdit);
-        setHaveSubmitted(statusResponse.data.haveSubmitted);
-        setSigned(statusResponse.data.signed);
-        setApproved(statusResponse.data.approved);
-        setRejected(statusResponse.data.rejected);
-      } catch (error) {
-        console.error("Error fetching status data:", error);
-        setError(error);
-      }
+    try {
+      const statusResponse = await axios.get(`https://api-siexpert.vercel.app/api/retur/analysis/status/${id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setCanEdit(statusResponse.data.canEdit);
+      setHaveSubmitted(statusResponse.data.haveSubmitted);
+      setSigned(statusResponse.data.signed);
+      setApproved(statusResponse.data.approved);
+      setRejected(statusResponse.data.rejected);
+    } catch (error) {
+      console.error("Error fetching status data:", error);
+      setError(error);
     }
-  }, [analyzeId, id, token]);
+  }, [id, token]);
 
   useEffect(() => {
     fetchReturnData();
@@ -149,7 +149,7 @@ const useAnalysisData = ({ id, isEditingAnalysis, setIsEditingAnalysis, toast })
   };
 
   const handleSubmitAnalysis = async () => {
-    if (!analyzeId) return;
+    // if (!analyzeId) return;
 
     try {
       await axios.post(
@@ -167,6 +167,7 @@ const useAnalysisData = ({ id, isEditingAnalysis, setIsEditingAnalysis, toast })
       });
       setIsEditingAnalysis(false);
       refreshData();
+      navigate("/data-retur");
     } catch (error) {
       console.error("Error submitting analysis:", error);
       toast({
@@ -175,6 +176,8 @@ const useAnalysisData = ({ id, isEditingAnalysis, setIsEditingAnalysis, toast })
         description: "Failed to submit analysis.",
         variant: "destructive",
       });
+      refreshData();
+      navigate("/data-retur");
     }
   };
 
@@ -195,7 +198,8 @@ const useAnalysisData = ({ id, isEditingAnalysis, setIsEditingAnalysis, toast })
         description: "Analysis approved successfully.",
         variant: "success",
       });
-      refreshData(); // Refresh data after approval
+      refreshData();
+      navigate("/data-retur");
     } catch (error) {
       console.error("Error approving analysis:", error);
       toast({
@@ -204,6 +208,8 @@ const useAnalysisData = ({ id, isEditingAnalysis, setIsEditingAnalysis, toast })
         description: "Failed to approve analysis.",
         variant: "destructive",
       });
+      refreshData();
+      navigate("/data-retur");
     }
   };
 
@@ -213,7 +219,7 @@ const useAnalysisData = ({ id, isEditingAnalysis, setIsEditingAnalysis, toast })
     try {
       await axios.post(
         `https://api-siexpert.vercel.app/api/retur/analysis/decision/${analyzeId}`,
-        { decision: "rejected", comment }, // Include comment in the request body
+        { decision: "rejected", comment },
         {
           headers: { Authorization: `Bearer ${token}` },
         }
@@ -224,7 +230,8 @@ const useAnalysisData = ({ id, isEditingAnalysis, setIsEditingAnalysis, toast })
         description: "Analysis rejected successfully.",
         variant: "success",
       });
-      refreshData(); // Refresh data after rejection
+      refreshData();
+      navigate("/data-retur");
     } catch (error) {
       console.error("Error rejecting analysis:", error);
       toast({
@@ -233,6 +240,8 @@ const useAnalysisData = ({ id, isEditingAnalysis, setIsEditingAnalysis, toast })
         description: "Failed to reject analysis.",
         variant: "destructive",
       });
+      refreshData();
+      navigate("/data-retur");
     }
   };
 
